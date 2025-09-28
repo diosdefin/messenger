@@ -1,0 +1,34 @@
+{% extends 'chat/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="chat-container p-4">
+            <div class="text-center text-danger mb-4">
+                <h2>⚠️ Удаление аккаунта</h2>
+            </div>
+            
+            <div class="alert alert-danger">
+                <h5>Внимание! Это действие необратимо!</h5>
+                <p class="mb-0">При удалении аккаунта:</p>
+                <ul class="mb-0">
+                    <li>Все ваши сообщения будут удалены</li>
+                    <li>Ваш профиль будет полностью удалён из системы</li>
+                    <li>Восстановление аккаунта невозможно</li>
+                </ul>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg" 
+                            onclick="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить!')">
+                        Да, удалить мой аккаунт
+                    </button>
+                    <a href="{% url 'user_list' %}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

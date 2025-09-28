@@ -1,0 +1,99 @@
+{% extends 'chat/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="chat-container">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">💬 Чат с {{ receiver.username }}</h4>
+                <a href="{% url 'user_list' %}" class="btn btn-light btn-sm">← Назад</a>
+            </div>
+            
+            <div id="chat-messages" class="card-body" style="height: 400px; overflow-y: auto;">
+                {% for message in messages %}
+                <div class="d-flex mb-3 {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %}">
+                    <div class="message-bubble {% if message.sender == request.user %}message-sent{% else %}message-received{% endif %}">
+                        <div class="message-content">{{ message.content }}</div>
+                        <small class="d-block text-end opacity-75">{{ message.timestamp|time:"H:i" }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted mt-5">
+                    <p>Начните общение! Отправьте первое сообщение.</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="card-footer">
+                <form id="message-form" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        {{ form.content }}
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const chatBody = document.getElementById('chat-messages');
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    // AJAX отправка сообщения
+    document.getElementById('message-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        try {
+            const response = await fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (response.ok) {
+                e.target.reset();
+                loadMessages();
+            }
+        } catch (error) {
+            console.error('Ошибка отправки:', error);
+        }
+    };
+
+    // Загрузка сообщений через API
+    async function loadMessages() {
+        try {
+            const response = await fetch("{% url 'get_messages' receiver.id %}");
+            const data = await response.json();
+            
+            let messagesHtml = '';
+            data.messages.forEach(message => {
+                const messageClass = message.is_sent ? 'message-sent justify-content-end' : 'message-received justify-content-start';
+                const alignClass = message.is_sent ? 'justify-content-end' : 'justify-content-start';
+                
+                messagesHtml += `
+                    <div class="d-flex mb-3 ${alignClass}">
+                        <div class="message-bubble ${message.is_sent ? 'message-sent' : 'message-received'}">
+                            <div class="message-content">${message.content}</div>
+                            <small class="d-block text-end opacity-75">${message.timestamp}</small>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            chatBody.innerHTML = messagesHtml || '<div class="text-center text-muted mt-5"><p>Начните общение! Отправьте первое сообщение.</p></div>';
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+        } catch (error) {
+            console.error('Ошибка загрузки сообщений:', error);
+        }
+    }
+
+    // Обновление каждые 2 секунды
+    setInterval(loadMessages, 2000);
+</script>
+{% endblock %}
