@@ -76,12 +76,13 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 USE_TZ = True
 
+# ✅ ИСПРАВЛЕННЫЕ НАСТРОЙКИ СТАТИКИ
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # для collectstatic
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # твои исходные файлы
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'user_list'
 LOGOUT_REDIRECT_URL = 'login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
