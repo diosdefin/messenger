@@ -1,6 +1,6 @@
 {
-  "name": "Messenger Chat",
-  "short_name": "Messenger",
+  "name": "ElChat",
+  "short_name": "ElChat",
   "description": "Простой и удобный мессенджер",
   "start_url": "/",
   "display": "standalone",
@@ -9,12 +9,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/static/icons/icon-192x192.png",
+      "src": "static/icons/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/static/icons/icon-512x512.png", 
+      "src": "static/icons/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
