@@ -1,17 +1,24 @@
 {% extends 'chat/base.html' %}
 
+{% block meta_title %}Пользователи ElChat | Список для общения{% endblock %}
+{% block meta_description %}Список пользователей мессенджера ElChat. Выберите с кем хотите пообщаться и начните переписку прямо сейчас.{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active">Пользователи</li>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="chat-container p-4">
-            <h2 class="text-center mb-4">Пользователи</h2>
+            <h1 class="text-center mb-4">Пользователи ElChat</h1>
             <div class="row">
                 {% for user in users %}
                 <div class="col-md-6 mb-3">
                     <div class="card user-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">👤 {{ user.username }}</h5>
+                                <h2 class="h5 card-title mb-0">👤 {{ user.username }}</h2>
                                 {% if request.user.is_staff and user != request.user %}
                                 <form method="post" action="{% url 'delete_user' user.id %}" class="d-inline">
                                     {% csrf_token %}
@@ -28,18 +35,18 @@
                             </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 {% if unread_counts.user.id > 0 %}
-                                <span class="badge bg-danger">{{ unread_counts.user.id }}</span>
+                                <span class="badge bg-danger">{{ unread_counts.user.id }} непрочитано</span>
                                 {% else %}
-                                <span></span>
+                                <span class="text-muted small">Нет новых сообщений</span>
                                 {% endif %}
-                                <a href="{% url 'chat' user.id %}" class="btn btn-primary btn-sm">Написать</a>
+                                <a href="{% url 'chat' user.id %}" class="btn btn-primary btn-sm">Начать общение</a>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p class="text-center text-muted">Пока нет других пользователей</p>
+                    <p class="text-center text-muted">Пока нет других пользователей в мессенджере</p>
                 </div>
                 {% endfor %}
             </div>

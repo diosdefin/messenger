@@ -10,6 +10,8 @@ class Message(models.Model):
 
     class Meta:
         ordering = ['timestamp']
+        verbose_name = 'Сообщение'
+        verbose_name_plural = 'Сообщения'
 
     def __str__(self):
         return f'{self.sender} to {self.receiver}: {self.content[:20]}'
@@ -17,3 +19,15 @@ class Message(models.Model):
     @staticmethod
     def get_unread_count(user, sender):
         return Message.objects.filter(receiver=user, sender=sender, is_read=False).count()
+
+# ПРОСТАЯ МОДЕЛЬ ДЛЯ SEO (без сложных полей)
+class SEOSettings(models.Model):
+    site_name = models.CharField('Название сайта', max_length=100, default='ElChat')
+    site_description = models.TextField('Описание сайта', default='Бесплатный мессенджер для общения')
+
+    def __str__(self):
+        return "SEO Настройки"
+
+    class Meta:
+        verbose_name = 'SEO настройка'
+        verbose_name_plural = 'SEO настройки'

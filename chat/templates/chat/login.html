@@ -1,10 +1,17 @@
 {% extends 'chat/base.html' %}
 
+{% block meta_title %}Вход в ElChat | Бесплатный мессенджер для общения{% endblock %}
+{% block meta_description %}Войдите в свой аккаунт ElChat - современного мессенджера для быстрого и безопасного общения. Бесплатный чат с друзьями.{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active">Вход</li>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="chat-container p-4">
-            <h2 class="text-center mb-4">Вход в мессенджер</h2>
+            <h1 class="text-center mb-4">Вход в мессенджер ElChat</h1>
             <form method="post">
                 {% csrf_token %}
                 <div class="mb-3">
@@ -15,10 +22,10 @@
                     <label for="password" class="form-label">Пароль</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Войти</button>
+                <button type="submit" class="btn btn-primary w-100">Войти в мессенджер</button>
             </form>
             <div class="text-center mt-3">
-                <a href="{% url 'register' %}">Нет аккаунта? Зарегистрируйтесь!</a>
+                <a href="{% url 'register' %}">Нет аккаунта? Зарегистрируйтесь в ElChat!</a>
             </div>
         </div>
     </div>
