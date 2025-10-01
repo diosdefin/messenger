@@ -1,24 +1,54 @@
 {% extends 'chat/base.html' %}
 
-{% block meta_title %}Пользователи ElChat | Список для общения{% endblock %}
-{% block meta_description %}Список пользователей мессенджера ElChat. Выберите с кем хотите пообщаться и начните переписку прямо сейчас.{% endblock %}
+{% block meta_title %}ElChat - Мессенджер от Daniel Aybek uulu (Даниел Айбек уулу){% endblock %}
+{% block meta_description %}ElChat - современный мессенджер созданный Daniel Aybek uulu (Даниел Айбек уулу). Бесплатное общение, быстрые сообщения.{% endblock %}
 
 {% block breadcrumb_items %}
 <li class="breadcrumb-item active">Пользователи</li>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
+<!-- Добавьте этот блок ПЕРЕД списком пользователей -->
+<div class="row mb-4">
+    <div class="col-12">
         <div class="chat-container p-4">
-            <h1 class="text-center mb-4">Пользователи ElChat</h1>
+            <h1>ElChat - Мессенджер от Daniel Aybek uulu</h1>
+            <p class="lead"><strong>ElChat</strong> - современная платформа для общения, созданная <strong>Daniel Aybek uulu (Даниел Айбек уулу)</strong>. 
+            Присоединяйтесь к нашему сообществу и общайтесь бесплатно!</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>👨‍💻 О создателе</h3>
+                    <p>Проект разработан <strong>Daniel Aybek uulu</strong> (также известен как <strong>Даниел Айбек уулу</strong>, 
+                    <strong>Daniel Aibek uulu</strong>, <strong>Aybek uulu Daniel</strong>) в рамках изучения веб-разработки и SEO.</p>
+                    <a href="{% url 'about_me' %}" class="btn btn-primary">Узнать больше о Daniel Aybek uulu</a>
+                </div>
+                <div class="col-md-6">
+                    <h3>🚀 Возможности</h3>
+                    <ul>
+                        <li>Мгновенные сообщения</li>
+                        <li>Бесплатное использование</li>
+                        <li>Безопасное общение</li>
+                        <li>Современный дизайн</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Остальной код списка пользователей -->
+<div class="row justify-content-center">
+    <div class="col-md-12">
+        <div class="chat-container p-4">
+            <h2 class="text-center mb-4">Пользователи ElChat</h2>
             <div class="row">
                 {% for user in users %}
                 <div class="col-md-6 mb-3">
                     <div class="card user-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h2 class="h5 card-title mb-0">👤 {{ user.username }}</h2>
+                                <h3 class="h5 card-title mb-0">👤 {{ user.username }}</h3>
                                 {% if request.user.is_staff and user != request.user %}
                                 <form method="post" action="{% url 'delete_user' user.id %}" class="d-inline">
                                     {% csrf_token %}

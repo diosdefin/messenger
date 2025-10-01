@@ -7,7 +7,7 @@ class StaticViewSitemap(Sitemap):
     changefreq = 'weekly'
 
     def items(self):
-        return ['login', 'register', 'user_list']
+        return ['login', 'register', 'user_list', 'about_me']  # ДОБАВЬТЕ 'about_me'
 
     def location(self, item):
         return reverse(item)
@@ -21,3 +21,6 @@ class UserSitemap(Sitemap):
 
     def location(self, obj):
         return reverse('chat', args=[obj.id])
+    
+
+

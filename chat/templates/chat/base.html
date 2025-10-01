@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- ОСНОВНЫЕ META-ТЕГИ -->
-    <title>{% block meta_title %}ElChat - Мессенджер для народа{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}ElChat - современный мессенджер для быстрого и безопасного общения. Бесплатный чат.{% endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}мессенджер, чат, общение, кыргызстан, бесплатный мессенджер{% endblock %}">
-    
+     <!-- ОСНОВНЫЕ META-ТЕГИ -->
+    <title>{% block meta_title %}ElChat - Мессенджер для народа | Daniel Aybek uulu{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}ElChat - современный мессенджер от Daniel Aybek uulu (Даниел Айбек уулу). Бесплатное общение, быстрые сообщения, безопасный чат.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}ElChat, элчат, Элчат, эл чат, Daniel, Даниел, Даниель, Даниэль, Daniel Aybek uulu, Daniel Aibek uulu, Даниел Айбек уулу, Aybek uulu Daniel, Aibek uulu Daniel, мессенджер, чат, общение, Кыргызстан{% endblock %}">
+
     <!-- OPEN GRAPH -->
-    <meta property="og:title" content="{% block og_title %}ElChat - Мессенджер для народа{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Бесплатный мессенджер для общения{% endblock %}">
+    <meta property="og:title" content="ElChat - Мессенджер от Daniel Aybek uulu">
+    <meta property="og:description" content="Бесплатный мессенджер для общения. Создано Daniel Aybek uulu (Даниел Айбек уулу)">
     <meta property="og:type" content="website">
     <meta property="og:image" content="{% static 'icons/icon-192x192.png' %}">
-    
+
     <!-- FAVICON -->
     <link rel="icon" href="{% static 'icons/icon-192x192.png' %}" type="image/png">
 
@@ -91,24 +91,28 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'user_list' %}">ElChat</a>
-            <div class="navbar-nav ms-auto">
-                {% if user.is_authenticated %}
-                <span class="navbar-text me-3">Привет, {{ user.username }}!</span>
-                {% if user.is_staff %}
-                <a class="nav-link" href="/admin/">Админка</a>
-                {% endif %}
-                <a class="nav-link text-warning" href="{% url 'delete_account' %}">Удалить аккаунт</a>
-                <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
-                {% else %}
-                <a class="nav-link" href="{% url 'login' %}">Войти</a>
-                <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
-                {% endif %}
-            </div>
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'user_list' %}">ElChat</a>
+        <div class="navbar-nav ms-auto">
+            {% if user.is_authenticated %}
+            <span class="navbar-text me-3">Привет, {{ user.username }}!</span>
+            {% if user.is_staff %}
+            <a class="nav-link" href="/admin/">Админка</a>
+            {% endif %}
+            <!-- ДОБАВЬТЕ ЭТУ ССЫЛКУ: -->
+            <a class="nav-link" href="{% url 'about_me' %}">О Daniel Aybek uulu</a>
+            <a class="nav-link text-warning" href="{% url 'delete_account' %}">Удалить аккаунт</a>
+            <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+            {% else %}
+            <a class="nav-link" href="{% url 'login' %}">Войти</a>
+            <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+            <!-- ДОБАВЬТЕ И ДЛЯ НЕАВТОРИЗОВАННЫХ: -->
+            <a class="nav-link" href="{% url 'about_me' %}">О создателе</a>
+            {% endif %}
         </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="container py-4 py-11">
         <!-- Хлебные крошки -->

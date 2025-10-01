@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views  # ✅ ДОБАВЬ ЭТУ СТРОЧКУ!
+from . import views 
 
 urlpatterns = [
     path('register/', views.register, name='register'),
@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/chat/<int:user_id>/messages/', views.get_new_messages, name='get_messages'),
     path('delete-account/', views.delete_account, name='delete_account'),
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
+     path('about/', views.about_me, name='about_me'),
 ]

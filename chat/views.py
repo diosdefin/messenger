@@ -72,6 +72,17 @@ def user_list(request):
     }
     return render(request, 'chat/user_list.html', context)
 
+def about_me(request):
+    seo_context = get_seo_context()
+    context = {
+        'meta_title': 'Daniel Aybek uulu (Даниел Айбек уулу) | Создатель ElChat',
+        'meta_description': 'Daniel Aybek uulu (Даниел Айбек уулу) - разработчик мессенджера ElChat. Узнайте больше о создателе проекта и его работе.',
+        'meta_keywords': 'Daniel Aybek uulu, Даниел Айбек уулу, Daniel Aibek uulu, Aybek uulu Daniel, разработчик ElChat, создатель мессенджера',
+        **seo_context
+    }
+    return render(request, 'chat/about_me.html', context)
+
+
 @login_required
 def chat(request, user_id):
     receiver = get_object_or_404(User, id=user_id, is_active=True)
