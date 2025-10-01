@@ -5,15 +5,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseForbidden
 from django.db import models
 from django.contrib import messages as django_messages
-from .models import Message, SEOSettings
+from django.views.decorators.csrf import csrf_exempt
+import json
+import os
+from .models import Message
 from .forms import CustomUserCreationForm, MessageForm
 
-# ПРОСТАЯ ФУНКЦИЯ ДЛЯ SEO (без сложной логики)
 def get_seo_context():
     return {
-        'site_name': 'ElChat - Мессенджер для народа',
+        'site_name': 'ElChat - Современный мессенджер',
         'site_description': 'Бесплатный мессенджер для быстрого и безопасного общения',
-        'default_title': 'ElChat - Мессенджер для народа',
+        'default_title': 'ElChat - Мессенджер для общения',
         'default_description': 'Общайтесь бесплатно в нашем мессенджере',
     }
 
@@ -21,7 +23,7 @@ def register(request):
     seo_context = get_seo_context()
     context = {
         'meta_title': 'Регистрация в ElChat | Бесплатный мессенджер',
-        'meta_description': 'Зарегистрируйтесь в ElChat - современном мессенджере',
+        'meta_description': 'Зарегистрируйтесь в ElChat - современном мессенджере для общения',
         **seo_context
     }
     
@@ -30,6 +32,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            django_messages.success(request, 'Добро пожаловать в ElChat!')
             return redirect('user_list')
     else:
         form = CustomUserCreationForm()
@@ -41,7 +44,7 @@ def login_view(request):
     seo_context = get_seo_context()
     context = {
         'meta_title': 'Вход в ElChat | Мессенджер для общения',
-        'meta_description': 'Войдите в свой аккаунт ElChat',
+        'meta_description': 'Войдите в свой аккаунт ElChat для начала общения',
         **seo_context
     }
     
@@ -52,6 +55,8 @@ def login_view(request):
         if user is not None:
             login(request, user)
             return redirect('user_list')
+        else:
+            django_messages.error(request, 'Неверный логин или пароль')
     
     return render(request, 'chat/login.html', context)
 
@@ -59,13 +64,14 @@ def login_view(request):
 def user_list(request):
     seo_context = get_seo_context()
     users = User.objects.exclude(id=request.user.id).filter(is_active=True)
+    
     unread_counts = {}
     for user in users:
         unread_counts[user.id] = Message.get_unread_count(request.user, user)
     
     context = {
         'meta_title': 'Пользователи ElChat | Список контактов',
-        'meta_description': 'Список пользователей ElChat',
+        'meta_description': 'Список пользователей ElChat для начала общения',
         'users': users,
         'unread_counts': unread_counts,
         **seo_context
@@ -75,67 +81,104 @@ def user_list(request):
 def about_me(request):
     seo_context = get_seo_context()
     context = {
-        'meta_title': 'Daniel Aybek uulu (Даниел Айбек уулу) | Создатель ElChat',
-        'meta_description': 'Daniel Aybek uulu (Даниел Айбек уулу) - разработчик мессенджера ElChat. Узнайте больше о создателе проекта и его работе.',
-        'meta_keywords': 'Daniel Aybek uulu, Даниел Айбек уулу, Daniel Aibek uulu, Aybek uulu Daniel, разработчик ElChat, создатель мессенджера',
+        'meta_title': 'О создателе ElChat | Современный мессенджер',
+        'meta_description': 'ElChat - современный мессенджер для удобного общения',
         **seo_context
     }
     return render(request, 'chat/about_me.html', context)
 
-
 @login_required
 def chat(request, user_id):
-    receiver = get_object_or_404(User, id=user_id, is_active=True)
-    messages = Message.objects.filter(
-        models.Q(sender=request.user, receiver=receiver) |
-        models.Q(sender=receiver, receiver=request.user)
-    ).order_by('timestamp')
+    try:
+        receiver = get_object_or_404(User, id=user_id, is_active=True)
+        messages = Message.objects.filter(
+            models.Q(sender=request.user, receiver=receiver) |
+            models.Q(sender=receiver, receiver=request.user)
+        ).order_by('timestamp')
 
-    Message.objects.filter(sender=receiver, receiver=request.user, is_read=False).update(is_read=True)
+        # Помечаем сообщения как прочитанные
+        Message.objects.filter(sender=receiver, receiver=request.user, is_read=False).update(is_read=True)
+        
+        seo_context = get_seo_context()
+        context = {
+            'meta_title': f'Чат с {receiver.username} | ElChat Мессенджер',
+            'meta_description': f'Чат с пользователем {receiver.username} в ElChat',
+            'receiver': receiver,
+            'messages': messages,
+            **seo_context
+        }
+        
+        if request.method == 'POST':
+            message_type = request.POST.get('message_type', 'text')
+            media_file = request.FILES.get('media_file')
+            content = request.POST.get('content', '')
+            
+            # Создаем сообщение
+            message = Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                content=content,
+                message_type=message_type,
+                media_file=media_file
+            )
+            return redirect('chat', user_id=user_id)
+        else:
+            form = MessageForm()
+        
+        context['form'] = form
+        return render(request, 'chat/chat.html', context)
     
-    seo_context = get_seo_context()
-    context = {
-        'meta_title': f'Чат с {receiver.username} | ElChat Мессенджер',
-        'meta_description': f'Чат с пользователем {receiver.username} в ElChat',
-        'receiver': receiver,
-        'messages': messages,
-        **seo_context
-    }
+    except Exception as e:
+        django_messages.error(request, f'Ошибка: {str(e)}')
+        return redirect('user_list')
+
+@login_required
+def get_new_messages(request, user_id):
+    try:
+        receiver = get_object_or_404(User, id=user_id, is_active=True)
+        messages = Message.objects.filter(
+            models.Q(sender=request.user, receiver=receiver) |
+            models.Q(sender=receiver, receiver=request.user)
+        ).order_by('timestamp')
+        
+        messages_data = []
+        for message in messages:
+            messages_data.append({
+                'id': message.id,
+                'sender': message.sender.username,
+                'content': message.content,
+                'message_type': message.message_type,
+                'media_url': message.media_file.url if message.media_file else None,
+                'timestamp': message.timestamp.strftime('%H:%M'),
+                'is_sent': message.sender == request.user,
+            })
+        
+        return JsonResponse({'messages': messages_data})
     
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+@csrf_exempt
+def send_sticker(request, user_id):
     if request.method == 'POST':
-        form = MessageForm(request.POST)
-        if form.is_valid():
+        try:
+            data = json.loads(request.body)
+            sticker = data.get('sticker', '')
+            
+            receiver = get_object_or_404(User, id=user_id)
             Message.objects.create(
                 sender=request.user,
                 receiver=receiver,
-                content=form.cleaned_data['content']
+                content=sticker,
+                message_type='sticker'
             )
-            return redirect('chat', user_id=user_id)
-    else:
-        form = MessageForm()
+            
+            return JsonResponse({'status': 'success'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     
-    context['form'] = form
-    return render(request, 'chat/chat.html', context)
-
-# ✅ ПРАВИЛЬНОЕ НАЗВАНИЕ ФУНКЦИИ (исправлено)
-@login_required
-def get_new_messages(request, user_id):  # ← Теперь правильно
-    receiver = get_object_or_404(User, id=user_id, is_active=True)
-    messages = Message.objects.filter(
-        models.Q(sender=request.user, receiver=receiver) |
-        models.Q(sender=receiver, receiver=request.user)
-    ).order_by('timestamp')
-    
-    messages_data = []
-    for message in messages:
-        messages_data.append({
-            'sender': message.sender.username,
-            'content': message.content,
-            'timestamp': message.timestamp.strftime('%H:%M'),
-            'is_sent': message.sender == request.user
-        })
-    
-    return JsonResponse({'messages': messages_data})
+    return JsonResponse({'status': 'error', 'message': 'Invalid method'}, status=405)
 
 @login_required
 def delete_account(request):
@@ -165,3 +208,34 @@ def delete_user(request, user_id):
         return redirect('user_list')
     
     return render(request, 'chat/confirm_delete.html', {'user_to_delete': user_to_delete})
+
+
+
+
+
+
+from django.shortcuts import render
+from django.contrib.auth.models import User
+
+def user_list(request):
+    users = User.objects.all()
+
+    # список смайлов как Python-массив
+    stickers = [
+        "😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇",
+        "🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚",
+        "😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🤩",
+        "🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣",
+        "😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬",
+        "🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗",
+        "🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯",
+        "😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐",
+        "🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈",
+        "👿","👹","👺","🤡","💩","👻","💀","☠️","👽","👾",
+        "🤖","🎃","😺","😸","😹","😻","😼","😽","🙀","😿","😾"
+    ]
+
+    return render(request, "chat/user_list.html", {
+        "users": users,
+        "stickers": stickers
+    })

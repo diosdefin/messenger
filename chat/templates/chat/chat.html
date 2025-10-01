@@ -1,99 +1,353 @@
 {% extends 'chat/base.html' %}
+{% load static %}
+
+{% block meta_title %}Чат с {{ receiver.username }} | ElChat Мессенджер{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'user_list' %}">Пользователи</a></li>
+<li class="breadcrumb-item active">Чат с {{ receiver.username }}</li>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="chat-container">
+<div class="row justify-content-center h-100">
+    <div class="col-12 col-md-10 col-lg-8 h-100 d-flex flex-column">
+        <div class="chat-container flex-grow-1 d-flex flex-column">
+            <!-- Заголовок чата -->
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">💬 Чат с {{ receiver.username }}</h4>
-                <a href="{% url 'user_list' %}" class="btn btn-light btn-sm">← Назад</a>
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'user_list' %}" class="btn btn-outline-light btn-sm me-3">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                         style="width: 40px; height: 40px;">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">{{ receiver.username }}</h5>
+                        <small class="text-muted">
+                            <i class="fas fa-circle text-success me-1"></i>Online
+                        </small>
+                    </div>
+                </div>
             </div>
             
-            <div id="chat-messages" class="card-body" style="height: 400px; overflow-y: auto;">
+            <!-- Область сообщений -->
+            <div id="chat-messages" class="card-body flex-grow-1" style="overflow-y: auto;">
                 {% for message in messages %}
                 <div class="d-flex mb-3 {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %}">
                     <div class="message-bubble {% if message.sender == request.user %}message-sent{% else %}message-received{% endif %}">
-                        <div class="message-content">{{ message.content }}</div>
+                        <div class="message-content">
+                            {% if message.message_type == 'sticker' %}
+                            <span style="font-size: 2rem;">{{ message.content }}</span>
+                            {% else %}
+                            {{ message.content }}
+                            {% endif %}
+                        </div>
                         <small class="d-block text-end opacity-75">{{ message.timestamp|time:"H:i" }}</small>
                     </div>
                 </div>
                 {% empty %}
-                <div class="text-center text-muted mt-5">
-                    <p>Начните общение! Отправьте первое сообщение.</p>
+                <div class="text-center text-muted h-100 d-flex align-items-center justify-content-center">
+                    <div>
+                        <i class="fas fa-comments fa-3x mb-3"></i>
+                        <p>Начните общение! Отправьте первое сообщение.</p>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
             
-            <div class="card-footer">
-                <form id="message-form" method="post">
+            <!-- Форма отправки сообщений -->
+            <div class="card-footer p-0">
+                <form method="post" id="message-form" class="p-3">
                     {% csrf_token %}
+                    <input type="hidden" name="message_type" id="message-type-input" value="text">
+                    
                     <div class="input-group">
-                        {{ form.content }}
-                        <button type="submit" class="btn btn-primary">Отправить</button>
+                        <!-- Кнопка стикеров -->
+                        <button type="button" class="btn btn-outline-secondary" onclick="toggleStickers()" title="Стикеры">
+                            <i class="far fa-smile"></i>
+                        </button>
+                        
+                        <!-- Кнопка загрузки фото -->
+                        <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('photo-input').click()" title="Фото">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        
+                        <!-- Кнопка загрузки видео -->
+                        <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('video-input').click()" title="Видео">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        
+                        <!-- Поле ввода сообщения -->
+                        <textarea name="content" id="message-input" class="form-control message-input" 
+                                  placeholder="Введите ваше сообщение..." rows="1" style="resize: none;"></textarea>
+                        
+                        <!-- Скрытые input для медиафайлов -->
+                        <input type="file" id="photo-input" accept="image/*" class="d-none" onchange="sendPhoto(this.files[0])">
+                        <input type="file" id="video-input" accept="video/*" class="d-none" onchange="sendVideo(this.files[0])">
+                        
+                        <!-- Кнопка отправки -->
+                        <button type="submit" class="btn btn-primary send-btn" id="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </form>
+                
+                <!-- Выбор стикеров -->
+                <div id="sticker-picker" class="p-3 border-top" style="display: none; background: var(--card-dark);">
+                    <div class="row">
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😀')">😀</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😃')">😃</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😄')">😄</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😁')">😁</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😆')">😆</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😅')">😅</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😂')">😂</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('🤣')">🤣</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😊')">😊</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😇')">😇</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('🙂')">🙂</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('🙃')">🙃</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😉')">😉</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😌')">😌</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('😍')">😍</span></div>
+                        <div class="col-2 text-center mb-2"><span class="sticker-btn" onclick="sendSticker('🥰')">🥰</span></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    const chatBody = document.getElementById('chat-messages');
-    chatBody.scrollTop = chatBody.scrollHeight;
-
-    // AJAX отправка сообщения
-    document.getElementById('message-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        
-        try {
-            const response = await fetch('', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            });
-            
-            if (response.ok) {
-                e.target.reset();
-                loadMessages();
-            }
-        } catch (error) {
-            console.error('Ошибка отправки:', error);
+<style>
+    /* 100% ширина для мобильных */
+    @media (max-width: 768px) {
+        .col-md-10 {
+            flex: 0 0 100%;
+            max-width: 100%;
         }
-    };
-
-    // Загрузка сообщений через API
-    async function loadMessages() {
-        try {
-            const response = await fetch("{% url 'get_messages' receiver.id %}");
-            const data = await response.json();
-            
-            let messagesHtml = '';
-            data.messages.forEach(message => {
-                const messageClass = message.is_sent ? 'message-sent justify-content-end' : 'message-received justify-content-start';
-                const alignClass = message.is_sent ? 'justify-content-end' : 'justify-content-start';
-                
-                messagesHtml += `
-                    <div class="d-flex mb-3 ${alignClass}">
-                        <div class="message-bubble ${message.is_sent ? 'message-sent' : 'message-received'}">
-                            <div class="message-content">${message.content}</div>
-                            <small class="d-block text-end opacity-75">${message.timestamp}</small>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            chatBody.innerHTML = messagesHtml || '<div class="text-center text-muted mt-5"><p>Начните общение! Отправьте первое сообщение.</p></div>';
-            chatBody.scrollTop = chatBody.scrollHeight;
-            
-        } catch (error) {
-            console.error('Ошибка загрузки сообщений:', error);
+        .message-bubble {
+            max-width: 85%;
+        }
+        .chat-container {
+            border-radius: 0;
+            border: none;
+            height: 100vh;
         }
     }
+    
+    /* Для компьютеров */
+    @media (min-width: 769px) {
+        .col-lg-8 {
+            flex: 0 0 95%;
+            max-width: 95%;
+        }
+    }
+    
+    .sticker-btn {
+        font-size: 1.8rem;
+        cursor: pointer;
+        display: block;
+        transition: transform 0.2s;
+    }
+    
+    .sticker-btn:hover {
+        transform: scale(1.2);
+    }
+    
+    .send-btn {
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 
-    // Обновление каждые 2 секунды
-    setInterval(loadMessages, 2000);
+<script>
+    // Прокрутка вниз при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+        scrollToBottom();
+        updateSendButton();
+    });
+    
+    function scrollToBottom() {
+        const chatMessages = document.getElementById('chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function toggleStickers() {
+        const picker = document.getElementById('sticker-picker');
+        picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    // Отправка стикера
+    function sendSticker(sticker) {
+        fetch(`/api/chat/{{ receiver.id }}/send_sticker/`, {
+            method: 'POST',
+            body: JSON.stringify({sticker: sticker}),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.getElementById('sticker-picker').style.display = 'none';
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка отправки стикера');
+        });
+    }
+    
+    // Отправка фото
+    function sendPhoto(file) {
+        if (!file) return;
+        
+        const formData = new FormData();
+        formData.append('media_file', file);
+        formData.append('message_type', 'image');
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        fetch('', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Ошибка отправки фото');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка отправки фото');
+        });
+    }
+    
+    // Отправка видео
+    function sendVideo(file) {
+        if (!file) return;
+        
+        const formData = new FormData();
+        formData.append('media_file', file);
+        formData.append('message_type', 'video');
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        fetch('', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Ошибка отправки видео');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ошибка отправки видео');
+        });
+    }
+    
+    // Обновление состояния кнопки отправки
+    function updateSendButton() {
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const hasText = messageInput.value.trim().length > 0;
+        
+        sendButton.disabled = !hasText;
+    }
+    
+    // Отправка по Enter
+    document.getElementById('message-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const sendButton = document.getElementById('send-button');
+            if (!sendButton.disabled) {
+                document.getElementById('message-form').submit();
+            }
+        }
+    });
+    
+    // Авто-обновление высоты textarea
+    document.getElementById('message-input').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        updateSendButton();
+    });
+    
+    // Обновление сообщений каждые 3 секунды
+    setInterval(updateMessages, 3000);
+    
+    function updateMessages() {
+        fetch(`/api/chat/{{ receiver.id }}/messages/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.messages && data.messages.length > 0) {
+                    const chatMessages = document.getElementById('chat-messages');
+                    const currentMessageIds = new Set(
+                        Array.from(chatMessages.querySelectorAll('.message-bubble'))
+                            .map(el => el.closest('.d-flex').dataset.messageId)
+                    );
+                    
+                    let hasNewMessages = false;
+                    
+                    data.messages.forEach(message => {
+                        if (!currentMessageIds.has(message.id.toString())) {
+                            hasNewMessages = true;
+                            addMessageToChat(message);
+                        }
+                    });
+                    
+                    if (hasNewMessages) {
+                        scrollToBottom();
+                    }
+                }
+            })
+            .catch(error => console.error('Error updating messages:', error));
+    }
+    
+    function addMessageToChat(message) {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `d-flex mb-3 ${message.is_sent ? 'justify-content-end' : 'justify-content-start'}`;
+        messageDiv.dataset.messageId = message.id;
+        
+        let messageContent = '';
+        if (message.message_type === 'sticker') {
+            messageContent = `
+                <div class="message-bubble ${message.is_sent ? 'message-sent' : 'message-received'}">
+                    <div class="message-content">
+                        <span style="font-size: 2rem;">${message.content}</span>
+                    </div>
+                    <small class="d-block text-end opacity-75">${message.timestamp}</small>
+                </div>
+            `;
+        } else {
+            messageContent = `
+                <div class="message-bubble ${message.is_sent ? 'message-sent' : 'message-received'}">
+                    <div class="message-content">${message.content}</div>
+                    <small class="d-block text-end opacity-75">${message.timestamp}</small>
+                </div>
+            `;
+        }
+        
+        messageDiv.innerHTML = messageContent;
+        chatMessages.appendChild(messageDiv);
+        
+        // Убираем сообщение "нет сообщений"
+        const emptyMessage = chatMessages.querySelector('.text-center');
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
+    }
 </script>
 {% endblock %}

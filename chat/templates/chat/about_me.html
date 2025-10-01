@@ -1,45 +1,99 @@
 {% extends 'chat/base.html' %}
 
-{% block meta_title %}Daniel Aybek uulu (Даниел Айбек уулу) | Создатель ElChat{% endblock %}
-{% block meta_description %}Daniel Aybek uulu (Даниел Айбек уулу) - разработчик современного мессенджера ElChat. Узнайте больше о создателе проекта.{% endblock %}
+{% block meta_title %}ElChat - Современный мессенджер для общения | О проекте{% endblock %}
+{% block meta_description %}ElChat - современный мессенджер для бесплатного общения. Удобный интерфейс, быстрые сообщения, безопасный чат. Общайтесь с друзьями и близкими.{% endblock %}
+{% block meta_keywords %}ElChat, элчат, Элчат, эл чат, мессенджер, чат, общение, сообщения, бесплатный чат, Daniel, Даниел, diosdefin, ddefin, Даниель, Даниэль, Daniel Aybek uulu, Daniel Aibek uulu, Aybek uulu Daniel, Aibek uulu Daniel{% endblock %}
 
 {% block breadcrumb_items %}
-<li class="breadcrumb-item active">О создателе</li>
+<li class="breadcrumb-item active">О проекте</li>
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="chat-container p-4">
-            <h1 class="text-center mb-4">Daniel Aybek uulu</h1>
-            <h2 class="text-center h4 text-muted mb-4">Даниел Айбек уулу - создатель ElChat</h2>
+    <div class="col-lg-10">
+        <div class="chat-container p-4 mb-4">
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">ElChat - Современный мессенджер</h1>
+                <p class="lead">Бесплатная платформа для быстрого и удобного общения</p>
+            </div>
             
-            <div class="row">
-                <div class="col-md-8">
-                    <h3>О проекте ElChat</h3>
-                    <p><strong>ElChat</strong> - это современный мессенджер, разработанный <strong>Daniel Aybek uulu (Даниел Айбек уулу)</strong> для удобного и безопасного общения.</p>
+            <div class="row mb-5">
+                <div class="col-md-6">
+                    <h2 class="h3 mb-3"><i class="fas fa-rocket me-2 text-primary"></i>О проекте ElChat</h2>
+                    <p class="mb-4">
+                        ElChat - это современный веб-мессенджер, созданный для удобного и безопасного общения. 
+                        Наша платформа предлагает мгновенный обмен сообщениями, поддержку стикеров, 
+                        отправку изображений и видео, а также интуитивно понятный интерфейс.
+                    </p>
                     
-                    <h3>Технологии</h3>
-                    <p>Проект создан с использованием Django, Python, Bootstrap и современных веб-технологий.</p>
-                    
-                    <h3>Цель проекта</h3>
-                    <p>ElChat демонстрирует возможности веб-разработки и SEO-оптимизации от <strong>Daniel Aibek uulu</strong>.</p>
-                </div>
-                <div class="col-md-4">
-                    <div class="card bg-dark">
-                        <div class="card-body">
-                            <h4>Daniel Aybek uulu</h4>
-                            <p class="mb-1"><strong>Также известен как:</strong></p>
-                            <ul class="small">
-                                <li>Даниел Айбек уулу</li>
-                                <li>Daniel Aibek uulu</li>
-                                <li>Aybek uulu Daniel</li>
-                                <li>Даниель Айбек уулу</li>
-                                <li>Даниэль Айбек уулу</li>
-                            </ul>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-3 bg-dark rounded">
+                                <i class="fas fa-bolt fa-2x text-warning mb-2"></i>
+                                <h6 class="mb-0">Мгновенная доставка</h6>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-3 bg-dark rounded">
+                                <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                                <h6 class="mb-0">Безопасность</h6>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-3 bg-dark rounded">
+                                <i class="fas fa-mobile-alt fa-2x text-info mb-2"></i>
+                                <h6 class="mb-0">Адаптивный дизайн</h6>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-3 bg-dark rounded">
+                                <i class="fas fa-smile fa-2x text-primary mb-2"></i>
+                                <h6 class="mb-0">Стикеры и медиа</h6>
+                            </div>
                         </div>
                     </div>
                 </div>
+                
+                <div class="col-md-6">
+                    <h2 class="h3 mb-3"><i class="fas fa-code me-2 text-success"></i>Технологии</h2>
+                    <p class="mb-4">
+                        ElChat построен на современных технологиях для обеспечения 
+                        надежности и скорости работы:
+                    </p>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-primary me-2 mb-2">Django</span>
+                        <span class="badge bg-success me-2 mb-2">Python</span>
+                        <span class="badge bg-info me-2 mb-2">JavaScript</span>
+                        <span class="badge bg-warning me-2 mb-2">Bootstrap 5</span>
+                        <span class="badge bg-dark me-2 mb-2">HTML5</span>
+                        <span class="badge bg-danger me-2 mb-2">CSS3</span>
+                    </div>
+                    
+                    <div class="alert alert-dark mt-4">
+                        <h6 class="alert-heading"><i class="fas fa-lightbulb me-2"></i>Будущие обновления</h6>
+                        <p class="mb-0 small">В планах: голосовые сообщения, групповые чаты, видеозвонки и многое другое!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center p-4 bg-dark rounded">
+                <h3 class="mb-3">Начните общаться прямо сейчас!</h3>
+                <p class="mb-4">Присоединяйтесь к ElChat и общайтесь с друзьями бесплатно</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'user_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-comments me-2"></i>Начать общение
+                </a>
+                {% else %}
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Регистрация
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Войти
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

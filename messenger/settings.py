@@ -5,9 +5,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'ваш-секретный-ключ-здесь'
 
+
 DEBUG = False
 
-ALLOWED_HOSTS = ["ddefin.pythonanywhere.com", "*"]
+ALLOWED_HOSTS = ["ddefin.pythonanywhere.com", "*", "127.0.0.1", "localhost"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -78,11 +79,23 @@ USE_TZ = True
 
 # ✅ ИСПРАВЛЕННЫЕ НАСТРОЙКИ СТАТИКИ
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # для collectstatic
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]  # твои исходные файлы
+
+# Для разработки (DEBUG = True)
+if DEBUG:
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+else:
+    # Для продакшена
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Медиа файлы
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'user_list'
 LOGOUT_REDIRECT_URL = 'login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Настройки для сообщений
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

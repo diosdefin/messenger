@@ -1,83 +1,127 @@
 {% extends 'chat/base.html' %}
 
-{% block meta_title %}ElChat - Мессенджер от Daniel Aybek uulu (Даниел Айбек уулу){% endblock %}
-{% block meta_description %}ElChat - современный мессенджер созданный Daniel Aybek uulu (Даниел Айбек уулу). Бесплатное общение, быстрые сообщения.{% endblock %}
+{% block meta_title %}ElChat - Пользователи и контакты | Современный мессенджер{% endblock %}
+{% block meta_description %}Список пользователей ElChat для начала общения. Найдите друзей и начинайте общаться в современном мессенджере.{% endblock %}
 
 {% block breadcrumb_items %}
 <li class="breadcrumb-item active">Пользователи</li>
 {% endblock %}
 
 {% block content %}
-<!-- Добавьте этот блок ПЕРЕД списком пользователей -->
-<div class="row mb-4">
+<div class="row">
     <div class="col-12">
-        <div class="chat-container p-4">
-            <h1>ElChat - Мессенджер от Daniel Aybek uulu</h1>
-            <p class="lead"><strong>ElChat</strong> - современная платформа для общения, созданная <strong>Daniel Aybek uulu (Даниел Айбек уулу)</strong>. 
-            Присоединяйтесь к нашему сообществу и общайтесь бесплатно!</p>
+        <div class="chat-container p-4 mb-4">
+            <h1 class="text-center mb-3"><i class="fas fa-comments me-2"></i>ElChat - Современный мессенджер</h1>
+            <p class="lead text-center mb-4">Бесплатная платформа для быстрого и удобного общения</p>
             
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <h3>👨‍💻 О создателе</h3>
-                    <p>Проект разработан <strong>Daniel Aybek uulu</strong> (также известен как <strong>Даниел Айбек уулу</strong>, 
-                    <strong>Daniel Aibek uulu</strong>, <strong>Aybek uulu Daniel</strong>) в рамках изучения веб-разработки и SEO.</p>
-                    <a href="{% url 'about_me' %}" class="btn btn-primary">Узнать больше о Daniel Aybek uulu</a>
-                </div>
-                <div class="col-md-6">
-                    <h3>🚀 Возможности</h3>
-                    <ul>
-                        <li>Мгновенные сообщения</li>
-                        <li>Бесплатное использование</li>
-                        <li>Безопасное общение</li>
-                        <li>Современный дизайн</li>
-                    </ul>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 rounded bg-dark">
+                                <i class="fas fa-bolt fa-2x text-primary mb-2"></i>
+                                <h5>Мгновенные сообщения</h5>
+                                <small class="text-muted">Отправляйте сообщения в реальном времени</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 rounded bg-dark">
+                                <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
+                                <h5>Безопасное общение</h5>
+                                <small class="text-muted">Ваши сообщения защищены</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 rounded bg-dark">
+                                <i class="fas fa-mobile-alt fa-2x text-info mb-2"></i>
+                                <h5>Удобный интерфейс</h5>
+                                <small class="text-muted">Работает на всех устройствах</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Остальной код списка пользователей -->
-<div class="row justify-content-center">
-    <div class="col-md-12">
+<div class="row">
+    <div class="col-12">
         <div class="chat-container p-4">
-            <h2 class="text-center mb-4">Пользователи ElChat</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0"><i class="fas fa-users me-2"></i>Пользователи</h2>
+                {% if total_unread and total_unread > 0 %}
+                <span class="badge bg-primary fs-6">
+                    Непрочитанных: {{ total_unread }}
+                </span>
+                {% endif %}
+            </div>
+            
             <div class="row">
                 {% for user in users %}
-                <div class="col-md-6 mb-3">
-                    <div class="card user-card">
+                <div class="col-lg-6 col-xl-4 mb-3">
+                    <div class="card user-card h-100" onclick="location.href='{% url 'chat' user.id %}'">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h3 class="h5 card-title mb-0">👤 {{ user.username }}</h3>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                         style="width: 40px; height: 40px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="card-title mb-0">{{ user.username }}</h5>
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ user.date_joined|date:"d.m.Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                
                                 {% if request.user.is_staff and user != request.user %}
-                                <form method="post" action="{% url 'delete_user' user.id %}" class="d-inline">
+                                <form method="post" action="{% url 'delete_user' user.id %}" 
+                                      class="d-inline" onclick="event.stopPropagation();">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn delete-btn btn-sm" 
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" 
                                             onclick="return confirm('Удалить пользователя {{ user.username }}?')" 
                                             title="Удалить пользователя">
-                                        🗑️
+                                        <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
                                 {% endif %}
                             </div>
-                            <p class="card-text text-muted small mb-2">
-                                Зарегистрирован: {{ user.date_joined|date:"d.m.Y" }}
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
                                 {% if unread_counts.user.id > 0 %}
-                                <span class="badge bg-danger">{{ unread_counts.user.id }} непрочитано</span>
+                                <span class="unread-badge">{{ unread_counts.user.id }}</span>
                                 {% else %}
-                                <span class="text-muted small">Нет новых сообщений</span>
+                                <small class="text-muted">
+                                    <i class="fas fa-check me-1"></i>Нет новых сообщений
+                                </small>
                                 {% endif %}
-                                <a href="{% url 'chat' user.id %}" class="btn btn-primary btn-sm">Начать общение</a>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-comment me-1"></i>Написать
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <div class="col-12">
-                    <p class="text-center text-muted">Пока нет других пользователей в мессенджере</p>
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">Пока нет других пользователей</h4>
+                        <p class="text-muted">Пригласите друзей присоединиться к ElChat!</p>
+                    </div>
                 </div>
+                {% endfor %}
+            </div>
+
+            <hr class="my-4">
+
+            <h3 class="mb-3">Стикеры</h3>
+            <div class="stickers">
+                {% for sticker in stickers %}
+                    <span style="font-size: 24px; margin: 4px;">{{ sticker }}</span>
                 {% endfor %}
             </div>
         </div>

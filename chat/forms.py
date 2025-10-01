@@ -9,7 +9,6 @@ class CustomUserCreationForm(UserCreationForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Делаем поля более красивыми
         self.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Придумайте логин'})
         self.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Придумайте пароль'})
         self.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Повторите пароль'})
@@ -17,9 +16,12 @@ class CustomUserCreationForm(UserCreationForm):
 class MessageForm(forms.Form):
     content = forms.CharField(
         widget=forms.Textarea(attrs={
-            'rows': 3,
+            'rows': 1,
             'placeholder': 'Введите ваше сообщение...',
-            'class': 'form-control'
+            'class': 'form-control message-input',
+            'id': 'message-input',
+            'style': 'resize: none;'
         }),
-        max_length=1000
+        max_length=1000,
+        required=False
     )
